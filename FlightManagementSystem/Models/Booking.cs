@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FlightManagementSystem.Models
 {
-    internal class Booking
+    public class Booking
     {
     }
 }
