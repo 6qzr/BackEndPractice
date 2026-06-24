@@ -15,6 +15,118 @@ namespace FlightManagementSystem
             Bookings   = new List<Booking>()
         };
 
+        public static void RegisterPassenger()
+        {
+            try
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("=========================================");
+                Console.WriteLine("       REGISTER PASSENGER");
+                Console.WriteLine("=========================================");
+                Console.ResetColor();
+
+                Console.Write("\n  Enter Passenger Name: ");
+                string passengerName = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(passengerName))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid passenger name. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Passenger Email: ");
+                string passengerEmail = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(passengerEmail))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid passenger email. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Passenger Phone Number: ");
+                string passengerPhone = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(passengerPhone))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid passenger phone. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Passenger Passport Number: ");
+                string passengerPassport = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(passengerPassport))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid passenger Passport Number. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                if (context.Passengers.Any(p => p.passportNumber == passengerPassport))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  A passenger with this passport number already exists. Press Enter");
+                    Console.ReadLine();
+                    return;
+                }
+
+                Console.Write("\n  Enter Passenger Nationality: ");
+                string passengerNationality = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(passengerNationality))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid passenger nationality. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                int passengerId = 1;
+                // Get greatest Passenger ID and add 1
+                if (context.Passengers.Count > 0)
+                {
+                    passengerId = context.Passengers.Max(p => p.passengerId) + 1;
+                }
+
+                context.Passengers.Add(new Passenger
+                {   
+                    passengerId = passengerId,
+                    passengerName = passengerName,
+                    passengerEmail = passengerEmail,
+                    passengerPhone = passengerPhone,
+                    passportNumber = passengerPassport,
+                    nationality = passengerNationality
+                });
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n  Passenger Registered Successfully.");
+                Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine($"  Passenger ID = {passengerId}");
+                Console.ResetColor();
+                Console.WriteLine("\n  Press Enter...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
+        
         public static void MainMenu()
         {
             bool running = true;
@@ -60,7 +172,7 @@ namespace FlightManagementSystem
                 switch (input)
                 {
                     case "1":
-                        //RegisterPassenger();
+                        RegisterPassenger();
                         break;
                     case "2":
                         //AddAircraft();
