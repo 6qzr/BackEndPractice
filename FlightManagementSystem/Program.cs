@@ -150,15 +150,15 @@ namespace FlightManagementSystem
                 }
 
                 Console.Write("\n  Enter Total Seats: ");
-                if (!int.TryParse(Console.ReadLine().Trim(), out int aircraftSeats))
+                if (!int.TryParse(Console.ReadLine().Trim(), out int aircraftSeats) || aircraftSeats <= 0)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n  Invalid seats. Press Enter");
+                    Console.WriteLine("\n  Invalid seats. Must be a positive number. Press Enter");
                     Console.ReadLine();
                     Console.ResetColor();
                     return;
                 }
-                
+
                 int aircraftId = 1;
                 // Get greatest Aircraft ID and add 1
                 if (context.Aircrafts.Count > 0)
