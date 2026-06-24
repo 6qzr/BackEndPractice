@@ -15,16 +15,21 @@ namespace FlightManagementSystem
             Bookings   = new List<Booking>()
         };
 
+        public static void DisplayHeader(string header)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("=========================================");
+            Console.WriteLine($"       {header.ToUpper()}");
+            Console.WriteLine("=========================================");
+            Console.ResetColor();
+        }
+        
         public static void RegisterPassenger()
         {
             try
             {
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("=========================================");
-                Console.WriteLine("       REGISTER PASSENGER");
-                Console.WriteLine("=========================================");
-                Console.ResetColor();
+                DisplayHeader("Rigester a Passenger");
 
                 Console.Write("\n  Enter Passenger Name: ");
                 string passengerName = Console.ReadLine().Trim();
@@ -126,6 +131,70 @@ namespace FlightManagementSystem
                 Console.ReadLine();
             }
         }
+
+        public static void AddAircraft()
+        {
+            try
+            {
+                DisplayHeader("Add an Aircraft");
+
+                Console.Write("\n  Enter Aircraft Model: ");
+                string aircraftModel = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(aircraftModel))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid aircraft model. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Total Seats: ");
+                if (!int.TryParse(Console.ReadLine().Trim(), out int aircraftSeats))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid seats. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+                
+                int aircraftId = 1;
+                // Get greatest Aircraft ID and add 1
+                if (context.Aircrafts.Count > 0)
+                {
+                    aircraftId = context.Aircrafts.Max(p => p.aircraftId) + 1;
+                }
+
+                context.Aircrafts.Add(new Aircraft
+                {
+                    aircraftId = aircraftId,
+                    model = aircraftModel,
+                    totalSeats = aircraftSeats,
+                    isOperational = true
+                });
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n  Aircraft Added Successfully.");
+                Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine($"  Aircraft ID = {aircraftId}");
+                Console.WriteLine($"  Aircraft Status: Operational");
+                Console.ResetColor();
+                Console.WriteLine("\n  Press Enter...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
         
         public static void MainMenu()
         {
@@ -133,12 +202,7 @@ namespace FlightManagementSystem
 
             while (running)
             {
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("=========================================");
-                Console.WriteLine("       FLIGHT MANAGEMENT SYSTEM");
-                Console.WriteLine("=========================================");
-                Console.ResetColor();
+                DisplayHeader("Flight Management System");
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("\n1. Register a Passenger");
@@ -175,7 +239,7 @@ namespace FlightManagementSystem
                         RegisterPassenger();
                         break;
                     case "2":
-                        //AddAircraft();
+                        AddAircraft();
                         break;
                     case "3":
                         //RegisterPilot();
