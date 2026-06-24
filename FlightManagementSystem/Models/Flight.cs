@@ -6,5 +6,16 @@ namespace FlightManagementSystem.Models
 {
     public class Flight
     {
+        public  int     flightId        { get; set; }   // System Generated
+        public  string  flightCode      { get; set; }   // User Input
+        public  int     aircraftId      { get; set; }   // Calculated From Aircraft aircraftId
+        public  int     pilotId         { get; set; }   // Calculated from Pilot pilotId
+        public  string  Origin          { get; set; }   // User Input
+        public  string  destination     { get; set; }   // User Input
+        public  string  departureDate   { get; set; }   // User Input
+        public  string  departureTime   { get; set; }   // User Input
+        public  decimal ticketPrice     { get; set; }   // User Input
+        public  int     availableSeats  { get; set; }   // Calculated from Aircraft totalSeats; decrements on booking
+        public  string  status          { get; set; }   // Default Value
     }
 }
