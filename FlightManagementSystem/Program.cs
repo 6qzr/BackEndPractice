@@ -80,6 +80,7 @@ namespace FlightManagementSystem
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("\n  A passenger with this passport number already exists. Press Enter");
                     Console.ReadLine();
+                    Console.ResetColor();
                     return;
                 }
 
@@ -196,6 +197,93 @@ namespace FlightManagementSystem
             }
         }
         
+        public static void RegisterPilot()
+        {
+            try
+            {
+                DisplayHeader("Register a Pilot");
+
+                Console.Write("\n  Enter Pilot Name: ");
+                string pilotName = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(pilotName))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid pilot name. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Pilot Phone: ");
+                string pilotPhone = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(pilotPhone))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid pilot phone. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter License Number: ");
+                string pilotLicense = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(pilotLicense))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid license number. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                if (context.Pilots.Any(p => p.licenseNumber == pilotLicense))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  A pilot with this license number already exists. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                int pilotId = 1;
+                // Get greatest Pilot ID and add 1
+                if (context.Pilots.Count > 0)
+                {
+                    pilotId = context.Pilots.Max(p => p.pilotId) + 1;
+                }
+
+                context.Pilots.Add(new Pilot
+                {
+                    pilotId = pilotId,
+                    pilotName = pilotName,
+                    pilotPhone = pilotPhone,
+                    licenseNumber = pilotLicense,
+                    flightHours = 0,
+                    isAvailable = true
+                });
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n  Pilot Added Successfully.");
+                Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine($"  Pilot ID = {pilotId}");
+                Console.WriteLine($"  Pilot Status: Available");
+                Console.ResetColor();
+                Console.WriteLine("\n  Press Enter...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
+         
         public static void MainMenu()
         {
             bool running = true;
@@ -242,7 +330,7 @@ namespace FlightManagementSystem
                         AddAircraft();
                         break;
                     case "3":
-                        //RegisterPilot();
+                        RegisterPilot();
                         break;
                     case "4":
                         //ViewAllFlights();
