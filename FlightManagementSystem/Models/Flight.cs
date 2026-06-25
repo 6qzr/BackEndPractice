@@ -10,7 +10,7 @@ namespace FlightManagementSystem.Models
         public  string  flightCode      { get; set; }   // User Input
         public  int     aircraftId      { get; set; }   // Calculated From Aircraft aircraftId
         public  int     pilotId         { get; set; }   // From List
-        public  string  Origin          { get; set; }   // User Input
+        public  string  origin          { get; set; }   // User Input
         public  string  destination     { get; set; }   // User Input
         public  string  departureDate   { get; set; }   // User Input
         public  string  departureTime   { get; set; }   // User Input

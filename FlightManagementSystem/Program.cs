@@ -283,7 +283,62 @@ namespace FlightManagementSystem
                 Console.ReadLine();
             }
         }
-         
+
+        public static void ViewAllFlights()
+        {
+            try
+            {
+                DisplayHeader("View All Flights");
+
+                if (context.Flights.Count == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n  No flights have been scheduled yet. Press Enter");
+                    Console.ResetColor();
+                    Console.ReadLine();
+                    return;
+                }
+
+                foreach (var flight in context.Flights)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"\n  Flight Code: {flight.flightCode}");
+                    Console.ResetColor();
+                    Console.WriteLine($"  Route: {flight.origin} => {flight.destination}");
+                    Console.WriteLine($"  Departure: {flight.departureDate} {flight.departureTime}");
+                    Console.WriteLine($"  Ticket Price: {flight.ticketPrice:C}");
+                    Console.WriteLine($"  Available Seats: {flight.availableSeats}");
+
+                    Console.ForegroundColor = flight.status switch
+                    {
+                        Constants.FlightScheduled => ConsoleColor.Green,
+                        Constants.FlightDeparted => ConsoleColor.Blue,
+                        Constants.FlightCancelled => ConsoleColor.Red,
+                        _ => ConsoleColor.White
+                    };
+                    Console.WriteLine($"  Status: {flight.status}");
+                    Console.ResetColor();
+
+                    Console.WriteLine("  -----------------------------------------");
+                }
+
+                Console.WriteLine($"\n  Total Flights: {context.Flights.Count}");
+                Console.WriteLine("\n  Press Enter...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
+
+
         public static void MainMenu()
         {
             bool running = true;
@@ -333,7 +388,7 @@ namespace FlightManagementSystem
                         RegisterPilot();
                         break;
                     case "4":
-                        //ViewAllFlights();
+                        ViewAllFlights();
                         break;
                     case "5":
                         //ScheduleFlight();
