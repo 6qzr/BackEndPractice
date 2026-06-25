@@ -7,7 +7,7 @@ namespace FlightManagementSystem.Models
     public class Flight
     {
         public  int     flightId        { get; set; }   // System Generated
-        public  string  flightCode      { get; set; }   // User Input
+        public  string  flightCode      { get; set; }   // System Generated
         public  int     aircraftId      { get; set; }   // Calculated From Aircraft aircraftId
         public  int     pilotId         { get; set; }   // From List
         public  string  origin          { get; set; }   // User Input

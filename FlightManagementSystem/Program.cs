@@ -338,7 +338,196 @@ namespace FlightManagementSystem
             }
         }
 
+        public static void ScheduleFlight()
+        {
+            try
+            {
+                DisplayHeader("Schedule A Flight");
 
+                List<Aircraft> aircrafts = context.Aircrafts
+                                  .Where(a => a.isOperational)
+                                  .ToList();
+
+                if (aircrafts.Count == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  No operational aircraft available. Cannot schedule a flight. Press Enter.");
+                    Console.ResetColor();
+                    Console.ReadLine();
+                    return;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"\n  {"ID",-5} {"Model",-20} {"Seats",-8}");
+                Console.WriteLine("  -----------------------------------------");
+                Console.ResetColor();
+                foreach (var a in aircrafts)
+                {
+                    Console.WriteLine($"  {a.aircraftId,-5} {a.model,-20} {a.totalSeats,-8}");
+                }
+
+                Console.Write("\n  Select an Aircraft ID: ");
+                if (!int.TryParse(Console.ReadLine().Trim(), out int selectedAircraft) || selectedAircraft <= 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid aircraft ID. Must be a positive number. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Aircraft aircraft = context.Aircrafts.FirstOrDefault(a => a.aircraftId == selectedAircraft);
+                if (aircraft == null || !aircraft.isOperational)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid aircraft ID. Aircraft does not exist or is not operational. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                List<Pilot> pilots = context.Pilots
+                            .Where(p => p.isAvailable)
+                            .ToList();
+
+                if (pilots.Count == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  No available pilots. Cannot schedule a flight. Press Enter.");
+                    Console.ResetColor();
+                    Console.ReadLine();
+                    return;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"\n  {"ID",-5} {"Name",-20} {"Hours",-8}");
+                Console.WriteLine("  -----------------------------------------");
+                Console.ResetColor();
+                foreach (var p in pilots)
+                {
+                    Console.WriteLine($"  {p.pilotId,-5} {p.pilotName,-20} {p.flightHours,-8}");
+                }
+
+                Console.Write("\n  Select a Pilot ID: ");
+                if (!int.TryParse(Console.ReadLine().Trim(), out int selectedPilot) || selectedPilot <= 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid pilot ID. Must be a positive number. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Pilot pilot = context.Pilots.FirstOrDefault(p => p.pilotId == selectedPilot);
+                if (pilot == null || !pilot.isAvailable)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid pilot ID. Pilot does not exist or is not available. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Flight Origin: ");
+                string flightOrigin = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(flightOrigin))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid flight origin. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Flight Destination: ");
+                string flightDestination = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(flightDestination))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid flight destination. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Flight Departure Date (yyyy-MM-dd HH:mm:ss): ");
+                if (!DateTime.TryParse(Console.ReadLine().Trim(), out DateTime departureDateTime))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid departure date. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+               
+                Console.Write("\n  Enter Flight Duration: ");
+                if (!double.TryParse(Console.ReadLine().Trim(), out double flightDuration))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid flight duration. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\n  Enter Ticket Price: ");
+                if (!decimal.TryParse(Console.ReadLine().Trim(), out decimal ticketPrice))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid ticket price. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                int flightId = 1;
+                if (context.Flights.Count > 0)
+                {
+                    flightId = context.Flights.Max(f => f.flightId) + 1;
+                }
+                string flightCode = $"OA-{flightId}";
+                context.Flights.Add(new Flight
+                {
+                    flightId = flightId,
+                    flightCode = flightCode,
+                    aircraftId = aircraft.aircraftId,
+                    pilotId = selectedPilot,
+                    origin = flightOrigin,
+                    destination = flightDestination,
+                    departureDate = departureDateTime.ToString("yyyy-MM-dd"),
+                    departureTime = departureDateTime.ToString("HH:mm:ss"),
+                    flightDuration = flightDuration,
+                    ticketPrice = ticketPrice,
+                    availableSeats = aircraft.totalSeats,
+                    status = Constants.FlightScheduled,
+                });
+
+                // Update Pilot Availability
+                pilot.isAvailable = false;
+                
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n  Flight Scheduled Successfully.");
+                Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine($"  Flight ID = {flightId}");
+                Console.WriteLine($"  Flight Code = {flightCode}");
+                Console.WriteLine($"  Flight Status: Scheduled");
+                Console.ResetColor();
+                Console.WriteLine("\n  Press Enter...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
+ 
         public static void MainMenu()
         {
             bool running = true;
@@ -391,7 +580,7 @@ namespace FlightManagementSystem
                         ViewAllFlights();
                         break;
                     case "5":
-                        //ScheduleFlight();
+                        ScheduleFlight();
                         break;
                     case "6":
                         //BookFlight();
