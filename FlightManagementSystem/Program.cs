@@ -658,6 +658,8 @@ namespace FlightManagementSystem
         {
             try
             {
+                DisplayHeader("Cancel A Booking");
+
                 Console.Write("\n  Enter your Passenger's ID: ");
                 if (!int.TryParse(Console.ReadLine().Trim(), out int passengerId))
                 {
