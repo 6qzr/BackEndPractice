@@ -757,7 +757,90 @@ namespace FlightManagementSystem
                 Console.ReadLine();
             }
         }
-        
+
+        public static void DepartFlight()
+        {
+            try
+            {
+                DisplayHeader("Depart a Flight");
+
+                List<Flight> flights = context.Flights
+                                              .Where(f => f.status == Constants.FlightScheduled)
+                                              .ToList();
+
+                if (flights.Count == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  No scheduled flights available to depart. Press Enter.");
+                    Console.ResetColor();
+                    Console.ReadLine();
+                    return;
+                }
+
+                foreach (var f in flights)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"\n  Flight Code: {f.flightCode}");
+                    Console.ResetColor();
+                    Console.WriteLine($"  Route: {f.origin} => {f.destination}");
+                    Console.WriteLine($"  Departure: {f.departureDate} {f.departureTime}");
+                    Console.WriteLine($"  Status: {f.status}");
+                    Console.WriteLine("  -----------------------------------------");
+                }
+
+                Console.Write("\n  Select a Flight ID: ");
+                if (!int.TryParse(Console.ReadLine().Trim(), out int selectedFlight) || selectedFlight <= 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid flight ID. Must be a positive number. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Flight flight = context.Flights.FirstOrDefault(f => f.flightId == selectedFlight);
+                if (flight == null || flight.status != Constants.FlightScheduled)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid flight ID. Flight does not exist or is not scheduled. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                // Set flight status to Departed
+                flight.status = Constants.FlightDeparted;
+
+                Pilot pilot = context.Pilots.FirstOrDefault(p => p.pilotId == flight.pilotId);
+                if (pilot != null)
+                {
+                    // Add flight duration to pilot's flightHours and make pilot available again
+                    pilot.flightHours += (int)flight.flightDuration;
+                    pilot.isAvailable = true;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n  Flight Departed Successfully.");
+                Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine($"  Flight Code = {flight.flightCode}");
+                Console.WriteLine($"  Pilot Flight Hours Updated = {pilot?.flightHours ?? 0}");
+                Console.ResetColor();
+                Console.WriteLine("\n  Press Enter...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
+
         public static void MainMenu()
         {
             bool running = true;
@@ -819,7 +902,7 @@ namespace FlightManagementSystem
                         CancelBooking();
                         break;
                     case "8":
-                        //DepartFlight();
+                        DepartFlight();
                         break;
                     case "9":
                         //CancelFlight();
