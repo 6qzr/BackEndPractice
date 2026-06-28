@@ -653,6 +653,108 @@ namespace FlightManagementSystem
                 Console.ReadLine();
             }
         }
+
+        public static void CancelBooking()
+        {
+            try
+            {
+                Console.Write("\n  Enter your Passenger's ID: ");
+                if (!int.TryParse(Console.ReadLine().Trim(), out int passengerId))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid passenger ID. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                if (!context.Passengers.Any(p => p.passengerId == passengerId))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid passenger ID. No passenger with such an ID. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                List<Booking> bookings = context.Bookings.Where(b => b.passengerId == passengerId
+                                                                && b.status == Constants.BookingConfirmed)
+                                                         .ToList();
+
+                if (bookings.Count == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  No active bookings found for this passenger. Press Enter.");
+                    Console.ResetColor();
+                    Console.ReadLine();
+                    return;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"\n  {"ID",-5} {"Flight Code",-12} {"Route",-20} {"Seat",-8} {"Price",-10}");
+                Console.WriteLine("  -----------------------------------------------------------------");
+                Console.ResetColor();
+
+                foreach (var b in bookings)
+                {
+                    Flight currFlight = context.Flights.FirstOrDefault(f => f.flightId == b.flightId);
+                    string route = currFlight != null ? $"{currFlight.origin} => {currFlight.destination}" : "Unknown";
+                    string flightCode = currFlight != null ? currFlight.flightCode : "N/A";
+
+                    Console.WriteLine($"  {b.bookingId,-5} {flightCode,-12} {route,-20} {b.seatNumber,-8} {b.totalPrice,-8:F2} OMR");
+                }
+
+                Console.Write("\n  Select a Booking ID to cancel: ");
+                if (!int.TryParse(Console.ReadLine().Trim(), out int selectedBookingId))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid booking ID. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Booking booking = bookings.FirstOrDefault(b => b.bookingId == selectedBookingId);
+                if (booking == null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid booking ID. Booking not found in the list above. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                // Update the booking status to cancelled
+                booking.status = Constants.BookingCancelled;
+
+                // Increment flight available seats by 1
+                Flight flight = context.Flights.FirstOrDefault(f => f.flightId == booking.flightId);
+                if (flight != null)
+                {
+                    flight.availableSeats++;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n  Booking Cancelled Successfully.");
+                Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine($"  Booking ID = {booking.bookingId}");
+                Console.WriteLine($"  Seat {booking.seatNumber} on {flight?.flightCode ?? "N/A"} is now available again.");
+                Console.ResetColor();
+                Console.WriteLine("\n  Press Enter...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
         
         public static void MainMenu()
         {
@@ -712,7 +814,7 @@ namespace FlightManagementSystem
                         BookFlight();
                         break;
                     case "7":
-                        //CancelBooking();
+                        CancelBooking();
                         break;
                     case "8":
                         //DepartFlight();
