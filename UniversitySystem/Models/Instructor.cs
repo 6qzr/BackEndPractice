@@ -36,8 +36,8 @@ namespace UniversitySystem.Models
         [MaxLength(50)]
         public string   academicTitle   { get; set; }   // From List
 
-        public virtual Department DepartmentHeaded { get; set; }
+        public virtual Department DepartmentHeaded { get; set; } // Navigation Property
 
-        public virtual ICollection<Course> Courses { get; set; }
+        public virtual ICollection<Course> Courses { get; set; } // Navigation Property
     }
 }

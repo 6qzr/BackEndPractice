@@ -34,12 +34,12 @@ namespace UniversitySystem.Models
 
         [ForeignKey("Instructor")]
         public  int?    instructorId    { get; set; }   // Foreign Key
-        public  virtual Instructor Instructor { get; set; }
+        public  virtual Instructor Instructor { get; set; } // Navigation Property
 
         [Required]
         [MaxLength(20)]
         public  string  semesterOffered { get; set; }   // User Input
 
-        public virtual ICollection<Enrollment> Enrollments { get; set; }
+        public virtual ICollection<Enrollment> Enrollments { get; set; } // Navigation Property
     }
 }

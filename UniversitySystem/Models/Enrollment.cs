@@ -14,11 +14,11 @@ namespace UniversitySystem.Models
         
         [ForeignKey("Student")]
         public  int         studentId       { get; set; }   // Foreign Key
-        public  virtual Student Student     { get; set; }
-        
+        public  virtual Student Student     { get; set; }   // Navigation Property
+
         [ForeignKey("Course")]
         public  int         courseId        { get; set; }   // Foreign Key
-        public  virtual     Course Course   { get; set; }
+        public  virtual     Course Course   { get; set; }   // Navigation Property
 
         [Required]
         public  DateTime    enrollmentDate  { get; set; }   // User Input
