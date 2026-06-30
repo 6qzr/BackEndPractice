@@ -10,6 +10,6 @@ namespace UniversitySystem.Models
         public  string  departmentName      { get; set; }   // User Input
         public  string  building            { get; set; }   // User Input
         public  decimal budget              { get; set; }   // User Input
-        public  int     headInstructorId    { get; set; }   // Foreign Key
+        public  int?    headInstructorId    { get; set; }   // Foreign Key
     }
 }
