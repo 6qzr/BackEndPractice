@@ -4,7 +4,7 @@ using System.Text;
 
 namespace UniversitySystem.Models
 {
-    internal class Student
+    public class Student
     {
         public  int      studentId      { get; set; }   // System Generated
         public  string   fullName       { get; set; }   // User Input
