@@ -25,10 +25,10 @@ namespace UniversitySystem.Models
         [Range(0, double.MaxValue)]
         public  decimal budget              { get; set; }   // User Input
 
-        [ForeignKey("Instructor")]
+        [ForeignKey("HeadInstructor")]
         public  int?    headInstructorId    { get; set; }   // Foreign Key
-        public  virtual Instructor Instructor { get; set; }
+        public  virtual Instructor HeadInstructor { get; set; } // Navigation Property
 
-        public virtual ICollection<Course> Courses { get; set; }
+        public virtual ICollection<Course> Courses { get; set; } // Navigation Property
     }
 }
