@@ -12,6 +12,6 @@ namespace UniversitySystem.Models
         public  string   phoneNumber    { get; set; }   // User Input
         public  DateTime dateOfBirth    { get; set; }   // User Input
         public  int      enrollmentYear { get; set; }   // User Input
-        public  decimal  gpa            { get; set; }   // User Input
+        public  decimal  gpa            { get; set; }   // Default Value
     }
 }
