@@ -13,6 +13,7 @@ namespace UniversitySystem.Models
     public class Course
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public  int     courseId        { get; set; }   // System Generated
 
         [Required]

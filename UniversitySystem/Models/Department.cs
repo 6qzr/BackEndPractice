@@ -11,6 +11,7 @@ namespace UniversitySystem.Models
     public class Department
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public  int     departmentId        { get; set; }   // System Generated
 
         [Required]

@@ -9,6 +9,7 @@ namespace UniversitySystem.Models
     public class Enrollment
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public  int         enrollmentId    { get; set; }   // System Generated
         
         [ForeignKey("Student")]
