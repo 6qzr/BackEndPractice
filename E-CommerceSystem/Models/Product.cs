@@ -13,7 +13,7 @@ namespace E_CommerceSystem.Models
         public  int         stockQuantity   { get; set; } = 0   // Default Value
         public  string      imageUrl        { get; set; }   // User Input
         public  int         categoryId      { get; set; }   // Foreign Key
-        public  DateTime    createdAt       { get; set; }   // System Generated
+        public  DateTime    createdAt       { get; set; } = DateTime.Now   // Default Value
         public  bool        isAvailable     { get; set; } = true;   // Default Value
     }
 }

@@ -13,7 +13,7 @@ namespace E_CommerceSystem.Models
         public  string      fullName            { get; set; }   // User Input
         public  string      phoneNumber         { get; set; }   // User Input
         public  string      address             { get; set; }   // User Input
-        public  DateTime    registerationDate   { get; set; }   // System Generated
+        public  DateTime    registerationDate   { get; set; } = DateTime.Now   // Default Value
         public  bool        isActive            { get; set; } = true;  // Default Value          
     }
 }
