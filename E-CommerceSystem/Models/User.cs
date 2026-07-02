@@ -7,6 +7,7 @@ using System.Text;
 
 namespace E_CommerceSystem.Models
 {
+    [Table("Users")]
     [Index(nameof(username), IsUnique = true)]
     [Index(nameof(email), IsUnique = true)]
     public class User
