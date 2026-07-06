@@ -1,4 +1,9 @@
-﻿namespace E_CommerceSystem
+﻿using E_CommerceSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace E_CommerceSystem
 {
     internal class Program
     {
@@ -8,10 +13,126 @@
         static void DisplayHeader(string header)
         {
             Console.Clear();
+            Console.WriteLine("==================================================");
+            Console.WriteLine($"       {header.ToUpper()}      ");
+            Console.WriteLine("==================================================");
+        }
+
+        /* 
+         * ADD Operations --------------------------------------------------------------------
+        */
+
+        // 01 Register a New User
+        static void RegisterNewUser()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            DisplayHeader("Register New User");
             Console.ResetColor();
-            Console.WriteLine("==================================================");
-            Console.WriteLine($"       {header}      ");
-            Console.WriteLine("==================================================");
+
+            Console.Write("\nEnter a Username: ");
+            string userName = Console.ReadLine().Trim();
+            if (string.IsNullOrEmpty(userName))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid username. Press Enter");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+
+            // Check for uniqueness in the database
+            bool usernameExists = context.Users.Any(u => u.username == userName);
+            if (usernameExists)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  This username is already taken. Please choose another one. Press Enter");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+
+            Console.Write("\nEnter User Email: ");
+            string email = Console.ReadLine().Trim();
+            if (string.IsNullOrEmpty(email))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid user email. Press Enter");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+            
+            // Validate structural format(e.g., text@domain.com)
+            if (!System.Net.Mail.MailAddress.TryCreate(email, out _))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid email format. Please enter a valid email. Press Enter");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+
+            // Validate uniqueness against the database using EF Core
+            bool emailExists = context.Users.Any(u => u.email == email);
+            if (emailExists)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  This email is already registered to an account. Press Enter");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+
+            Console.Write("\nEnter a Password: ");
+            string password = Console.ReadLine().Trim();
+            if (string.IsNullOrEmpty(password))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid password. Press Enter");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+            // Hash the plain-text password using BCrypt
+            string securePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+            Console.Write("\nEnter User Full Name: ");
+            string fullName = Console.ReadLine().Trim();
+            if (string.IsNullOrEmpty(fullName))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid user full name. Press Enter");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+
+            // Phone Number and Address can be null
+            Console.Write("\nEnter User Phone Number: ");
+            string phone = Console.ReadLine().Trim();
+
+            Console.Write("\nEnter User Address: ");
+            string address = Console.ReadLine().Trim();
+
+            User newUser = new User
+            {
+                username = userName,
+                email = email,
+                passwordHash = securePasswordHash,
+                fullName = fullName,
+                phoneNumber = phone,
+                address = address
+                // registerationDate and isActive are default
+            };
+
+            context.Users.Add(newUser);
+            context.SaveChanges();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\nNew User Registered Successfully.");
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine($"User ID = {newUser.userId}");
+            Console.ResetColor();
         }
 
         static void Main(string[] args)
@@ -57,7 +178,7 @@
                 switch (choice)
                 {
                     case "1":
-                        //RegisterNewUser();
+                        RegisterNewUser();
                         break;
                     case "2":
                         //AddProductToCategory();
