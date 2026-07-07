@@ -263,7 +263,7 @@ namespace E_CommerceSystem
             }
         }
 
-       
+        // 03 Place an Order
         static void PlaceOrder()
         {
             // Keep track of the newly initialized order entity out of local scopes to handle cleanup if needed
@@ -408,25 +408,38 @@ namespace E_CommerceSystem
                         continue;
                     }
 
-                    // Create OrderItem record as a bridge entity (inserted into context.OrderItems)
-                    OrderItem newOrderItem = new OrderItem
+                    var existingOrderItem = context.OrderItems
+                                                   .FirstOrDefault(oi => oi.orderId == newOrder.orderId && oi.productId == selectedProduct.productId);
+
+                    if (existingOrderItem != null)
                     {
-                        orderId = newOrder.orderId,
-                        productId = selectedProduct.productId,
-                        quantity = quantity,
-                    };
-                    context.OrderItems.Add(newOrderItem);
+                        // If it already exists, just accumulate the quantity on the same row
+                        existingOrderItem.quantity += quantity;
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"  -> Updated existing item. New total quantity: {existingOrderItem.quantity}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        // If it's a new item, create a fresh OrderItem bridge record
+                        OrderItem newOrderItem = new OrderItem
+                        {
+                            orderId = newOrder.orderId,
+                            productId = selectedProduct.productId,
+                            quantity = quantity,
+                        };
+                        context.OrderItems.Add(newOrderItem);
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"  -> Added {quantity} x '{selectedProduct.productName}' to checkout queue.");
+                        Console.ResetColor();
+                    }
 
                     // Accumulate totalAmount values
                     accumulatedTotal += (selectedProduct.price * quantity);
-
                     // Decrement stockQuantity on the product entity context references
                     selectedProduct.stockQuantity -= quantity;
                     hasItemsInCart = true;
-
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"  -> Added {quantity}x '{selectedProduct.productName}' to checkout queue.");
-                    Console.ResetColor();
                 }
 
                 // Update Order total amount field 
