@@ -1,7 +1,9 @@
 ﻿using E_CommerceSystem.Models;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design.Internal;
 using System.ComponentModel.DataAnnotations;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace E_CommerceSystem
@@ -261,6 +263,201 @@ namespace E_CommerceSystem
             }
         }
 
+       
+        static void PlaceOrder()
+        {
+            // Keep track of the newly initialized order entity out of local scopes to handle cleanup if needed
+            Order newOrder = null;
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                DisplayHeader("Place an Order");
+                Console.ResetColor();
+
+                // 1. Verify User ID
+                Console.Write("\nEnter User ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int userId) || !context.Users.Any(u => u.userId == userId))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid User ID. Press Enter.");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                // 2. Fetch Available Products (Early Check)
+                List<Product> products = context.Products
+                                                .Where(p => p.stockQuantity > 0 && p.isAvailable)
+                                                .ToList();
+
+                if (!products.Any())
+                {
+                    Console.WriteLine("\nNo products are currently available for purchase. Press Enter");
+                    Console.ReadLine();
+                    return;
+                }
+
+                // 3. Collect Shipping Information (Moved up to pass database requirement validation)
+                Console.Write("\nEnter Shipping Address: ");
+                string shippingAddress = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(shippingAddress) || shippingAddress.Length > 300)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Error: Shipping address cannot be empty or exceed 300 characters. Process Aborted. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                // 4. Collect Payment Method Options (Moved up to pass database requirement validation)
+                Console.WriteLine("\nSelect a Payment Method: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(" [1] Cash\n [2] Card\n [3] Apple Pay");
+                Console.ResetColor();
+
+                Console.Write("\nEnter option number (1-3): ");
+                string input = Console.ReadLine().Trim();
+                string paymentMethod;
+
+                switch (input)
+                {
+                    case "1": paymentMethod = "Cash"; break;
+                    case "2": paymentMethod = "Card"; break;
+                    case "3": paymentMethod = "Apple Pay"; break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\n  Error: Invalid choice. Process Aborted. Press Enter");
+                        Console.ReadLine();
+                        Console.ResetColor();
+                        return;
+                }
+
+                // Create and save the Order record first to obtain the orderId (Now valid with required fields)
+                newOrder = new Order
+                {
+                    userId = userId,
+                    shippingAddress = shippingAddress,
+                    paymentMethod = paymentMethod,
+                };
+                context.Orders.Add(newOrder);
+                context.SaveChanges();
+
+                // 5. Display Product Section
+                Console.WriteLine("\nAvailable Products\n");
+                Console.WriteLine(string.Format("{0,-6} | {1,-25} | {2,-12} | {3,-8}", "ID", "Product Name", "Price", "Stock"));
+                Console.WriteLine("--------------------------------------------------------------------------");
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                foreach (Product product in products)
+                {
+                    Console.WriteLine(string.Format(
+                        "{0,-6} | {1,-25} | {2,-12:C} | {3,-8}",
+                        product.productId,
+                        product.productName.Length > 25 ? product.productName.Substring(0, 22) + "..." : product.productName,
+                        product.price,
+                        product.stockQuantity
+                    ));
+                }
+                Console.ResetColor();
+                Console.WriteLine("==========================================================================");
+
+                decimal accumulatedTotal = 0;
+                bool hasItemsInCart = false;
+
+                // Let the user add multiple products via loop
+                while (true)
+                {
+                    Console.Write("\nEnter Product ID (Press Enter to checkout): ");
+                    Console.ResetColor();
+                    string productInput = Console.ReadLine();
+
+                    // Check if user pressed Enter on blank input to initiate checkout phase
+                    if (string.IsNullOrWhiteSpace(productInput))
+                    {
+                        if (!hasItemsInCart)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\n  Your order is empty. Add at least one item before checkout. Press Enter");
+                            Console.ReadLine();
+                            Console.ResetColor();
+                            continue;
+                        }
+                        break; // Break selection loop and finalize changes
+                    }
+
+                    // Validate Product Selection
+                    if (!int.TryParse(productInput, out int productId) || !products.Any(p => p.productId == productId))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\n  Invalid Product ID. Please select a valid item from the list. Press Enter");
+                        Console.ReadLine();
+                        Console.ResetColor();
+                        continue;
+                    }
+
+                    Product selectedProduct = products.First(f => f.productId == productId);
+
+                    // Validate Quantity against remaining real-time stock limits
+                    Console.Write($"Enter quantity for '{selectedProduct.productName}' (In Stock: {selectedProduct.stockQuantity}): ");
+                    if (!int.TryParse(Console.ReadLine(), out int quantity) || quantity <= 0 || selectedProduct.stockQuantity < quantity)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\n  Invalid quantity. Must be greater than 0 and within stock bounds. Press Enter");
+                        Console.ReadLine();
+                        Console.ResetColor();
+                        continue;
+                    }
+
+                    // Create OrderItem record as a bridge entity (inserted into context.OrderItems)
+                    OrderItem newOrderItem = new OrderItem
+                    {
+                        orderId = newOrder.orderId,
+                        productId = selectedProduct.productId,
+                        quantity = quantity,
+                    };
+                    context.OrderItems.Add(newOrderItem);
+
+                    // Accumulate totalAmount values
+                    accumulatedTotal += (selectedProduct.price * quantity);
+
+                    // Decrement stockQuantity on the product entity context references
+                    selectedProduct.stockQuantity -= quantity;
+                    hasItemsInCart = true;
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"  -> Added {quantity}x '{selectedProduct.productName}' to checkout queue.");
+                    Console.ResetColor();
+                }
+
+                // Update Order total amount field 
+                newOrder.totalAmount = accumulatedTotal;
+
+                // Final collective SaveChanges database commitment for all items and product inventory metrics
+                context.SaveChanges();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"\nSuccess: New order finalized! Order ID: {newOrder.orderId}. Total: {newOrder.totalAmount:C}.");
+                Console.ReadLine();
+                Console.ResetColor();
+            }
+            catch (Exception ex)
+            {
+                // Cleanup tracking artifact if database context faults out mid-operation
+                if (newOrder != null && context.Orders.Contains(newOrder))
+                {
+                    context.Orders.Remove(newOrder);
+                    context.SaveChanges();
+                }
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
 
         static void Main(string[] args)
         {
@@ -311,7 +508,7 @@ namespace E_CommerceSystem
                         AddProductToCategory();
                         break;
                     case "3":
-                        //PlaceOrder();
+                        PlaceOrder();
                         break;
                     case "4":
                         //WriteProductReview();
