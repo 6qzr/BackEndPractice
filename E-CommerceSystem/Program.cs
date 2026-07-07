@@ -1,4 +1,5 @@
 ﻿using E_CommerceSystem.Models;
+using Isopoh.Cryptography.Argon2;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using static System.Net.Mime.MediaTypeNames;
@@ -93,8 +94,12 @@ namespace E_CommerceSystem
                 Console.ResetColor();
                 return;
             }
+
             // Hash the plain-text password using BCrypt
-            string securePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+            //string securePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+            // Hash the plain-text password using Argon2id (Golden Standard)
+            string securePasswordHash = Argon2.Hash(password);
 
             Console.Write("\nEnter User Full Name: ");
             string fullName = Console.ReadLine().Trim();
