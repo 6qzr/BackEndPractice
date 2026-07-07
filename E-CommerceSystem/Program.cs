@@ -140,6 +140,128 @@ namespace E_CommerceSystem
             Console.ResetColor();
         }
 
+        // 02 Add a New Product to a Category
+        static void AddProductToCategory()
+        {
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                DisplayHeader("Add a New Product to a Category");
+                Console.ResetColor();
+
+                var categories = context.Categories.ToList();
+
+                Console.WriteLine("\nSelect Category: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                foreach (var category in categories)
+                {
+                    Console.WriteLine($"[{category.categoryId}] {category.categoryName}");
+                }
+                Console.ResetColor();
+
+                Console.Write("\nEnter Category ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int inputId) || !categories.Any(c => c.categoryId == inputId))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid Category ID. Press Enter.");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                int targetCategoryId = inputId;
+
+                // Product Name Input (Required)
+                Console.Write("\nEnter Product Name: ");
+                string productName = Console.ReadLine().Trim();
+                if (string.IsNullOrEmpty(productName))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("  Error: Product name is required. Press Enter.");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                // Description Input (Optional, Max Length 1000)
+                Console.Write("\nEnter Description (Optional): ");
+                string description = Console.ReadLine().Trim();
+                if (description.Length > 1000)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("  Error: Description cannot exceed 1000 characters. Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+                string? finalDescription = string.IsNullOrEmpty(description) ? null : description;
+
+                // Price Input (Required, Range 0.01 to Max)
+                Console.Write("\nEnter Price: ");
+                if (!decimal.TryParse(Console.ReadLine(), out decimal price) || price < 0.01m)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("  Error: Invalid price. Must be a positive decimal value (min 0.01). Press Enter");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                // Stock Quantity Input (Optional, Defaults to 0, Min 0)
+                Console.Write("\nEnter Stock Quantity (Press Enter for 0): ");
+                string stockInput = Console.ReadLine().Trim();
+                int stockQuantity = 0; // Baseline default match
+                if (!int.TryParse(stockInput, out stockQuantity) || stockQuantity < 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("  Error: Invalid quantity. Must be a whole number 0 or greater. Press Enter.");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                // Image URL Input (Optional, Max Length 300)
+                Console.Write("\nEnter Image URL (Optional): ");
+                string imageUrl = Console.ReadLine().Trim();
+                if (imageUrl.Length > 300)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("  Error: Image URL cannot exceed 300 characters.");
+                    Console.ResetColor();
+                    return;
+                }
+                string? finalImageUrl = string.IsNullOrEmpty(imageUrl) ? null : imageUrl;
+
+                Product newProduct = new Product
+                {
+                    productName = productName,
+                    description = description,
+                    price = price,
+                    stockQuantity = stockQuantity,
+                    imageUrl = finalImageUrl,
+                    categoryId = targetCategoryId
+                };
+
+                context.Products.Add(newProduct);
+                context.SaveChanges();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"\nSuccess: '{newProduct.productName}' Product ID {newProduct.productId}.");
+                Console.ResetColor();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
+
+
         static void Main(string[] args)
         {
             bool exit = false;
@@ -186,7 +308,7 @@ namespace E_CommerceSystem
                         RegisterNewUser();
                         break;
                     case "2":
-                        //AddProductToCategory();
+                        AddProductToCategory();
                         break;
                     case "3":
                         //PlaceOrder();
