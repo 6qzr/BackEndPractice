@@ -598,7 +598,7 @@ namespace E_CommerceSystem
             return productId;
         }
 
-        // Write a Product Review 
+        // 04 Write a Product Review 
         static void WriteProductReview()
         {
             try
@@ -672,6 +672,59 @@ namespace E_CommerceSystem
             }
         }
 
+
+        /* 
+         * UPDATE Operations --------------------------------------------------------------------
+        */
+
+        // 05 Update product price and availability
+        static void UpdateProductPriceAndAvailability()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            DisplayHeader("Update Product Price and Availability");
+            Console.ResetColor();
+
+            // List all products
+            List<Product> products = DisplayAvailableProducts();
+
+            int productId = GetProductID();
+            if (productId == -1) return;
+
+            Product selectedProduct = context.Products.FirstOrDefault(p => p.productId == productId);
+
+            Console.Write($"\nEnter new Price (Current: {selectedProduct.price}): ");
+            if (!decimal.TryParse(Console.ReadLine(), out decimal price) || price < 0.01m)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  Error: Invalid price. Must be a positive decimal value (min 0.01). Press Enter");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+            selectedProduct.price = price;
+
+            Console.Write($"\nUpdate Availability A/U (Current: {(selectedProduct.isAvailable ? "Available" : "Unavailable")}): ");
+            string availInput = Console.ReadLine().Trim().ToLower();
+            if (availInput != "a" && availInput != "u")
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid input. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+            selectedProduct.isAvailable = availInput == "a";
+
+            context.SaveChanges();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\nSuccess: Product Updated! Price: {selectedProduct.price}  Availability: {(selectedProduct.isAvailable ? "Available" : "Unavailable")}.");
+            Console.ResetColor();
+
+            Console.WriteLine("\nPress Enter to return...");
+            Console.ReadLine();
+        }
+
         static void Main(string[] args)
         {
             bool exit = false;
@@ -727,7 +780,7 @@ namespace E_CommerceSystem
                         WriteProductReview();
                         break;
                     case "5":
-                        //UpdateProductPriceAndAvailability();
+                        UpdateProductPriceAndAvailability();
                         break;
                     case "6":
                         //CancelOrder();
