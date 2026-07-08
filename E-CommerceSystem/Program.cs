@@ -472,6 +472,99 @@ namespace E_CommerceSystem
             }
         }
 
+        static List<User> DisplayAvailableUsers()
+        {
+            // Fetch active users from the database
+            var users = context.Users.Where(u => u.isActive).ToList();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\n=====================================================================================");
+            Console.WriteLine("                               AVAILABLE USERS SYSTEM                                ");
+            Console.WriteLine("=====================================================================================");
+            Console.ResetColor();
+
+            if (!users.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  No active users found in the system.");
+                Console.ResetColor();
+                return users;
+            }
+
+            // Table Column Headers
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(string.Format("{0,-6} | {1,-18} | {2,-22} | {3,-30}", "ID", "Username", "Full Name", "Email Address"));
+            Console.WriteLine("-------------------------------------------------------------------------------------");
+
+            // Print rows safely with text truncation lengths
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            foreach (var user in users)
+            {
+                string truncatedName = user.fullName?.Length > 22 ? user.fullName.Substring(0, 19) + "..." : user.fullName ?? "N/A";
+                string truncatedEmail = user.email.Length > 30 ? user.email.Substring(0, 27) + "..." : user.email;
+
+                Console.WriteLine(string.Format(
+                    "{0,-6} | {1,-18} | {2,-22} | {3,-30}",
+                    user.userId,
+                    user.username,
+                    truncatedName,
+                    truncatedEmail
+                ));
+            }
+            Console.ResetColor();
+            Console.WriteLine("=====================================================================================");
+
+            return users;
+        }
+
+        static List<Product> DisplayAvailableProducts()
+        {
+            // Fetch products that are active and have items in stock
+            List<Product> products = context.Products
+                                            .Where(p => p.stockQuantity > 0 && p.isAvailable)
+                                            .ToList();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\n==========================================================================");
+            Console.WriteLine("                            AVAILABLE PRODUCTS                            ");
+            Console.WriteLine("==========================================================================");
+            Console.ResetColor();
+
+            if (!products.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  No products are currently available for purchase.");
+                Console.ResetColor();
+                return products;
+            }
+
+            // Table Column Headers
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(string.Format("{0,-6} | {1,-25} | {2,-12} | {3,-8}", "ID", "Product Name", "Price", "Stock"));
+            Console.WriteLine("--------------------------------------------------------------------------");
+
+            // Print rows
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            foreach (Product product in products)
+            {
+                string truncatedProdName = product.productName.Length > 25 ? product.productName.Substring(0, 22) + "..." : product.productName;
+
+                Console.WriteLine(string.Format(
+                    "{0,-6} | {1,-25} | {2,-12:C} | {3,-8}",
+                    product.productId,
+                    truncatedProdName,
+                    product.price,
+                    product.stockQuantity
+                ));
+            }
+            Console.ResetColor();
+            Console.WriteLine("==========================================================================");
+
+            return products;
+        }
+
+        
+            
         static void Main(string[] args)
         {
             bool exit = false;
@@ -524,7 +617,7 @@ namespace E_CommerceSystem
                         PlaceOrder();
                         break;
                     case "4":
-                        //WriteProductReview();
+                        WriteProductReview();
                         break;
                     case "5":
                         //UpdateProductPriceAndAvailability();
