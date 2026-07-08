@@ -570,7 +570,93 @@ namespace E_CommerceSystem
             return products;
         }
 
-        
+        static int GetProductID()
+        {
+            Console.Write("\nEnter Product ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int productId) || !context.Products.Any(p => p.productId == productId))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid Product ID. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return -1;
+            }
+            return productId;
+        }
+
+        // Write a Product Review 
+        static void WriteProductReview()
+        {
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                DisplayHeader("Write a Product Review");
+                Console.ResetColor();
+
+                // List all available users
+                List<User> users = DisplayAvailableUsers();
+
+                int userId = GetUserID();
+                if (userId == -1) return;
+             
+                // List all products
+                List<Product> products = DisplayAvailableProducts();
+
+                int productId = GetProductID();
+                if (productId == -1) return;
+
+                Console.Write("\nEnter Product Rating (1-5): ");
+                if(!int.TryParse(Console.ReadLine(), out int rating) || rating > 5 || rating < 1)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Invalid product rating. Press Enter.");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.Write("\nEnter a comment (optional): ");
+                string? commentInput = Console.ReadLine().Trim();
+                if (commentInput.Length > 500)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n  Error: Review comment cannot exceed 500 characters. Press Enter.");
+                    Console.ReadLine();
+                    Console.ResetColor();
+                    return;
+                }
+                string? finalComment = string.IsNullOrEmpty(commentInput) ? null : commentInput;
+
+                Review newReview = new Review
+                {
+                    userId = userId,
+                    productId = productId,
+                    rating = rating,
+                    comment = finalComment
+                };
+
+                context.Reviews.Add(newReview);
+                context.SaveChanges();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"\nSuccess: New review submitted! Review ID: {newReview.reviewId}.");
+                Console.ReadLine();
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to return...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+
+                Console.WriteLine("\nPress Enter to continue...");
+                Console.ReadLine();
+            }
+        }
 
         static void Main(string[] args)
         {
