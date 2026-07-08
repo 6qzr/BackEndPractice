@@ -538,11 +538,11 @@ namespace E_CommerceSystem
             return users;
         }
 
-        static List<Product> DisplayAvailableProducts()
+        static List<Product> DisplayProducts()
         {
             // Fetch products that are active and have items in stock
             List<Product> products = context.Products
-                                            .Where(p => p.stockQuantity > 0 && p.isAvailable)
+                                            .Where(p => p.stockQuantity > 0)
                                             .ToList();
 
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -614,7 +614,7 @@ namespace E_CommerceSystem
                 if (userId == -1) return;
              
                 // List all products
-                List<Product> products = DisplayAvailableProducts();
+                List<Product> products = DisplayProducts();
 
                 int productId = GetProductID();
                 if (productId == -1) return;
@@ -654,7 +654,6 @@ namespace E_CommerceSystem
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"\nSuccess: New review submitted! Review ID: {newReview.reviewId}.");
-                Console.ReadLine();
                 Console.ResetColor();
 
                 Console.WriteLine("\nPress Enter to return...");
@@ -685,7 +684,7 @@ namespace E_CommerceSystem
             Console.ResetColor();
 
             // List all products
-            List<Product> products = DisplayAvailableProducts();
+            List<Product> products = DisplayProducts();
 
             int productId = GetProductID();
             if (productId == -1) return;
