@@ -446,6 +446,9 @@ namespace E_CommerceSystem
                     accumulatedTotal += (selectedProduct.price * quantity);
                     // Decrement stockQuantity on the product entity context references
                     selectedProduct.stockQuantity -= quantity;
+                    // Auto-mark unavailable when stock hits zero
+                    if (selectedProduct.stockQuantity == 0)
+                        selectedProduct.isAvailable = false;
                     hasItemsInCart = true;
                 }
 
