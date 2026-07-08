@@ -266,7 +266,7 @@ namespace E_CommerceSystem
         static int GetUserID()
         {
             Console.Write("\nEnter User ID: ");
-            if (!int.TryParse(Console.ReadLine(), out int userId) || !context.Users.Any(u => u.userId == userId))
+            if (!int.TryParse(Console.ReadLine(), out int userId))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("\n  Invalid User ID. Press Enter.");
@@ -274,6 +274,17 @@ namespace E_CommerceSystem
                 Console.ResetColor();
                 return -1;
             }
+
+            var user = context.Users.FirstOrDefault(u => u.userId == userId && u.isActive);
+            if (user == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  User not found or inactive. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return -1;
+            }
+
             return userId;
         }
         
