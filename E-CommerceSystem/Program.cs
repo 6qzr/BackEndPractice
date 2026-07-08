@@ -263,6 +263,20 @@ namespace E_CommerceSystem
             }
         }
 
+        static int GetUserID()
+        {
+            Console.Write("\nEnter User ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int userId) || !context.Users.Any(u => u.userId == userId))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid User ID. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return -1;
+            }
+            return userId;
+        }
+        
         // 03 Place an Order
         static void PlaceOrder()
         {
@@ -275,15 +289,8 @@ namespace E_CommerceSystem
                 Console.ResetColor();
 
                 // 1. Verify User ID
-                Console.Write("\nEnter User ID: ");
-                if (!int.TryParse(Console.ReadLine(), out int userId) || !context.Users.Any(u => u.userId == userId))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n  Invalid User ID. Press Enter.");
-                    Console.ReadLine();
-                    Console.ResetColor();
-                    return;
-                }
+                int userId = GetUserID();
+                if (userId == -1) return;
 
                 // 2. Fetch Available Products (Early Check)
                 List<Product> products = context.Products
@@ -564,7 +571,7 @@ namespace E_CommerceSystem
         }
 
         
-            
+
         static void Main(string[] args)
         {
             bool exit = false;
