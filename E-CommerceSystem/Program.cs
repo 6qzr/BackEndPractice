@@ -617,7 +617,7 @@ namespace E_CommerceSystem
 
                 Console.Write("\nEnter a comment (optional): ");
                 string? commentInput = Console.ReadLine().Trim();
-                if (commentInput.Length > 500)
+                if (commentInput.Length > 1000)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("\n  Error: Review comment cannot exceed 500 characters. Press Enter.");
