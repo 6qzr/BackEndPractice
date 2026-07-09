@@ -775,9 +775,7 @@ namespace E_CommerceSystem
         // 08 View All Products
         static List<Product> DisplayProducts()
         {
-            List<Product> products = context.Products
-                                            .Where(p => p.stockQuantity > 0)
-                                            .ToList();
+            List<Product> products = context.Products.ToList();
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("\n======================================================================================");
