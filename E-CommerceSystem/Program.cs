@@ -445,6 +445,7 @@ namespace E_CommerceSystem
                             orderId = newOrder.orderId,
                             productId = selectedProduct.productId,
                             quantity = quantity,
+                            unitPrice = selectedProduct.price
                         };
                         context.OrderItems.Add(newOrderItem);
 

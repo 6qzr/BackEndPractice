@@ -20,6 +20,10 @@ namespace E_CommerceSystem.Models
 
         [Required]
         [Range(1, 999)]
-        public int quantity { get; set; }
+        public int quantity { get; set; }   // User Input
+
+        [Required]
+        [Range(0.01, (double)decimal.MaxValue)]
+        public decimal unitPrice { get; set; } // Calculated
     }
 }
