@@ -725,6 +725,51 @@ namespace E_CommerceSystem
             Console.ReadLine();
         }
 
+        static int GetOrderID()
+        {
+            Console.Write("\nEnter Order ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int orderId) || !context.Orders.Any(o => o.orderId == orderId))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid Order ID. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return -1;
+            }
+            return orderId;
+        }
+        
+        // 06 Cancel an Order
+        static void CancelOrder()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            DisplayHeader("Cancel an Order");
+            Console.ResetColor();
+
+            int orderId = GetOrderID();
+            if (orderId == -1) return;
+
+            Order order = context.Orders.Include(o => o.OrderItems).ThenInclude(p => p.Product).FirstOrDefault(o => o.orderId == orderId);
+
+            foreach(OrderItem item in order.OrderItems)
+            {
+                Product product = item.Product;
+                product.stockQuantity += item.quantity;
+                if (!product.isAvailable) product.isAvailable = true;
+            }
+            
+            order.status = "Cancelled";
+
+            context.SaveChanges();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\nSuccess: Order {order.orderId} has been cancelled.");
+            Console.ResetColor();
+
+            Console.WriteLine("\nPress Enter to return...");
+            Console.ReadLine();
+        }
+
         static void Main(string[] args)
         {
             bool exit = false;
@@ -783,7 +828,7 @@ namespace E_CommerceSystem
                         UpdateProductPriceAndAvailability();
                         break;
                     case "6":
-                        //CancelOrder();
+                        CancelOrder();
                         break;
                     case "7":
                         //DeleteReview();
