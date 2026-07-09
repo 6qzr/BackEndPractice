@@ -541,46 +541,56 @@ namespace E_CommerceSystem
 
         static List<Product> DisplayProducts()
         {
-            // Fetch products that are active and have items in stock
             List<Product> products = context.Products
                                             .Where(p => p.stockQuantity > 0)
                                             .ToList();
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\n==========================================================================");
-            Console.WriteLine("                            AVAILABLE PRODUCTS                            ");
-            Console.WriteLine("==========================================================================");
+            Console.WriteLine("\n======================================================================================");
+            Console.WriteLine("                                     PRODUCTS                                        ");
+            Console.WriteLine("======================================================================================");
             Console.ResetColor();
 
             if (!products.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("  No products are currently available for purchase.");
+                Console.WriteLine("  No products found.");
                 Console.ResetColor();
                 return products;
             }
 
-            // Table Column Headers
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(string.Format("{0,-6} | {1,-25} | {2,-12} | {3,-8}", "ID", "Product Name", "Price", "Stock"));
-            Console.WriteLine("--------------------------------------------------------------------------");
+            Console.WriteLine(string.Format("{0,-6} | {1,-25} | {2,-12} | {3,-8} | {4,-12}", "ID", "Product Name", "Price", "Stock", "Availability"));
+            Console.WriteLine("--------------------------------------------------------------------------------------");
+            Console.ResetColor();
 
-            // Print rows
-            Console.ForegroundColor = ConsoleColor.Yellow;
             foreach (Product product in products)
             {
-                string truncatedProdName = product.productName.Length > 25 ? product.productName.Substring(0, 22) + "..." : product.productName;
+                string truncatedProdName = product.productName.Length > 25
+                    ? product.productName.Substring(0, 22) + "..."
+                    : product.productName;
 
-                Console.WriteLine(string.Format(
-                    "{0,-6} | {1,-25} | {2,-12:C} | {3,-8}",
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(string.Format("{0,-6} | {1,-25} | {2,-12:C} | {3,-8} | ",
                     product.productId,
                     truncatedProdName,
                     product.price,
-                    product.stockQuantity
-                ));
+                    product.stockQuantity));
+
+                if (product.isAvailable)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Available");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Unavailable");
+                }
             }
+
             Console.ResetColor();
-            Console.WriteLine("==========================================================================");
+            Console.WriteLine("======================================================================================");
 
             return products;
         }
@@ -834,7 +844,7 @@ namespace E_CommerceSystem
                         //DeleteReview();
                         break;
                     case "8":
-                        //ViewAllProducts();
+                        DisplayProducts();
                         break;
                     case "9":
                         //FilterProducts();
