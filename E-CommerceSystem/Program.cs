@@ -780,6 +780,49 @@ namespace E_CommerceSystem
             Console.ReadLine();
         }
 
+
+        /* 
+         * DELETE Operations --------------------------------------------------------------------
+        */
+
+        static int GetReviewID()
+        {
+            Console.Write("\nEnter Review ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int reviewId) || !context.Reviews.Any(r => r.reviewId == reviewId))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid Review ID. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return -1;
+            }
+            return reviewId;
+        }
+
+        // Delete a Review
+        static void DeleteReview()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            DisplayHeader("Delete a Review");
+            Console.ResetColor();
+
+            int reviewId = GetReviewID();
+            if (reviewId == -1) return;
+
+            Review review = context.Reviews.FirstOrDefault(r => r.reviewId == reviewId);
+
+            context.Reviews.Remove(review);
+
+            context.SaveChanges();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\nSuccess: Review with ID {reviewId} has been deleted.");
+            Console.ResetColor();
+
+            Console.WriteLine("\nPress Enter to return...");
+            Console.ReadLine();
+        }
+
         static void Main(string[] args)
         {
             bool exit = false;
@@ -841,7 +884,7 @@ namespace E_CommerceSystem
                         CancelOrder();
                         break;
                     case "7":
-                        //DeleteReview();
+                        DeleteReview();
                         break;
                     case "8":
                         DisplayProducts();
