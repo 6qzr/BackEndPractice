@@ -538,63 +538,7 @@ namespace E_CommerceSystem
 
             return users;
         }
-
-        static List<Product> DisplayProducts()
-        {
-            List<Product> products = context.Products
-                                            .Where(p => p.stockQuantity > 0)
-                                            .ToList();
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\n======================================================================================");
-            Console.WriteLine("                                     PRODUCTS                                        ");
-            Console.WriteLine("======================================================================================");
-            Console.ResetColor();
-
-            if (!products.Any())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("  No products found.");
-                Console.ResetColor();
-                return products;
-            }
-
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(string.Format("{0,-6} | {1,-25} | {2,-12} | {3,-8} | {4,-12}", "ID", "Product Name", "Price", "Stock", "Availability"));
-            Console.WriteLine("--------------------------------------------------------------------------------------");
-            Console.ResetColor();
-
-            foreach (Product product in products)
-            {
-                string truncatedProdName = product.productName.Length > 25
-                    ? product.productName.Substring(0, 22) + "..."
-                    : product.productName;
-
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(string.Format("{0,-6} | {1,-25} | {2,-12:C} | {3,-8} | ",
-                    product.productId,
-                    truncatedProdName,
-                    product.price,
-                    product.stockQuantity));
-
-                if (product.isAvailable)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Available");
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Unavailable");
-                }
-            }
-
-            Console.ResetColor();
-            Console.WriteLine("======================================================================================");
-
-            return products;
-        }
-
+        
         static int GetProductID()
         {
             Console.Write("\nEnter Product ID: ");
@@ -821,6 +765,68 @@ namespace E_CommerceSystem
 
             Console.WriteLine("\nPress Enter to return...");
             Console.ReadLine();
+        }
+
+
+        /* 
+         * Get Operations --------------------------------------------------------------------
+        */
+
+        // 08 View All Products
+        static List<Product> DisplayProducts()
+        {
+            List<Product> products = context.Products
+                                            .Where(p => p.stockQuantity > 0)
+                                            .ToList();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\n======================================================================================");
+            Console.WriteLine("                                     PRODUCTS                                        ");
+            Console.WriteLine("======================================================================================");
+            Console.ResetColor();
+
+            if (!products.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  No products found.");
+                Console.ResetColor();
+                return products;
+            }
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(string.Format("{0,-6} | {1,-25} | {2,-12} | {3,-8} | {4,-12}", "ID", "Product Name", "Price", "Stock", "Availability"));
+            Console.WriteLine("--------------------------------------------------------------------------------------");
+            Console.ResetColor();
+
+            foreach (Product product in products)
+            {
+                string truncatedProdName = product.productName.Length > 25
+                    ? product.productName.Substring(0, 22) + "..."
+                    : product.productName;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(string.Format("{0,-6} | {1,-25} | {2,-12:C} | {3,-8} | ",
+                    product.productId,
+                    truncatedProdName,
+                    product.price,
+                    product.stockQuantity));
+
+                if (product.isAvailable)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Available");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Unavailable");
+                }
+            }
+
+            Console.ResetColor();
+            Console.WriteLine("======================================================================================");
+
+            return products;
         }
 
         static void Main(string[] args)
