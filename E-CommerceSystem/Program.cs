@@ -829,6 +829,99 @@ namespace E_CommerceSystem
             return products;
         }
 
+        static int GetCategoryID()
+        {
+            Console.Write("\nEnter Category ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int categoryId) || !context.Categories.Any(c => c.categoryId == categoryId))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid Category ID. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return -1;
+            }
+            return categoryId;
+        }
+
+        // 09 Filter Products by Category and Price Range
+        static void FilterProducts()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            DisplayHeader("Filter Products by Category and Price Range");
+            Console.ResetColor();
+
+            int categoryId = GetCategoryID();
+            if (categoryId == -1) return;
+
+            Console.Write("\nEnter Maximum Price: ");
+            if (!decimal.TryParse(Console.ReadLine(), out decimal max) || max <= 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid maximum price. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+
+            Console.Write("\nEnter Minimum Price: ");
+            if (!decimal.TryParse(Console.ReadLine(), out decimal min) || min < 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Invalid minimum price. Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+
+            List<Product> products = context.Products
+                                            .Where(p => p.categoryId == categoryId && p.price <= max && p.price >= min)
+                                            .OrderBy(p => p.price)
+                                            .ToList();
+
+            if (!products.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  No products found.");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(string.Format("{0,-6} | {1,-25} | {2,-12} | {3,-8} | {4,-12}", "ID", "Product Name", "Price", "Stock", "Availability"));
+            Console.WriteLine("--------------------------------------------------------------------------------------");
+            Console.ResetColor();
+
+            foreach (Product product in products)
+            {
+                string truncatedProdName = product.productName.Length > 25
+                    ? product.productName.Substring(0, 22) + "..."
+                    : product.productName;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(string.Format("{0,-6} | {1,-25} | {2,-12:C} | {3,-8} | ",
+                    product.productId,
+                    truncatedProdName,
+                    product.price,
+                    product.stockQuantity));
+
+                if (product.isAvailable)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Available");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Unavailable");
+                }
+            }
+
+            Console.ResetColor();
+            Console.WriteLine("======================================================================================");
+
+        }
+
         static void Main(string[] args)
         {
             bool exit = false;
@@ -896,7 +989,7 @@ namespace E_CommerceSystem
                         DisplayProducts();
                         break;
                     case "9":
-                        //FilterProducts();
+                        FilterProducts();
                         break;
                     case "10":
                         //GetCategoryWithProducts();
