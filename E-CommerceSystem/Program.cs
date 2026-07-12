@@ -920,6 +920,75 @@ namespace E_CommerceSystem
 
         }
 
+        // 10 Get Category with All Its Products (Include)
+        static void GetCategoryWithProducts()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            DisplayHeader("Get Category with All Its Products");
+            Console.ResetColor();
+
+            int categoryId = GetCategoryID();
+            if (categoryId == -1) return;
+
+            Category category = context.Categories.FirstOrDefault(c => c.categoryId == categoryId);
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\n======================================================================================");
+            Console.WriteLine("                                CATEGORY DETAILS                                     ");
+            Console.WriteLine("======================================================================================");
+            Console.ResetColor();
+
+            Console.WriteLine(string.Format("{0,-20} {1}", "Category ID:", category.categoryId));
+            Console.WriteLine(string.Format("{0,-20} {1}", "Name:", category.categoryName));
+            Console.WriteLine(string.Format("{0,-20} {1}", "Description:", category.description ?? "N/A"));
+            Console.WriteLine(string.Format("{0,-20} {1}", "Image URL:", category.imageUrl ?? "N/A"));
+
+            Console.WriteLine("======================================================================================");
+
+            if (category.Products.Count == 0) 
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n  Selected Category has no products yet! Press Enter.");
+                Console.ReadLine();
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(string.Format("{0,-6} | {1,-25} | {2,-12} | {3,-8} | {4,-12}", "ID", "Product Name", "Price", "Stock", "Availability"));
+            Console.WriteLine("--------------------------------------------------------------------------------------");
+            Console.ResetColor();
+
+            foreach (Product product in category.Products)
+            {
+                string truncatedProdName = product.productName.Length > 25
+                    ? product.productName.Substring(0, 22) + "..."
+                    : product.productName;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(string.Format("{0,-6} | {1,-25} | {2,-12:C} | {3,-8} | ",
+                    product.productId,
+                    truncatedProdName,
+                    product.price,
+                    product.stockQuantity));
+
+                if (product.isAvailable)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Available");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Unavailable");
+                }
+            }
+
+            Console.ResetColor();
+            Console.WriteLine("======================================================================================");
+        }
+
         static void Main(string[] args)
         {
             bool exit = false;
@@ -990,7 +1059,7 @@ namespace E_CommerceSystem
                         FilterProducts();
                         break;
                     case "10":
-                        //GetCategoryWithProducts();
+                        GetCategoryWithProducts();
                         break;
                     case "11":
                         //ViewOrderHistory();
