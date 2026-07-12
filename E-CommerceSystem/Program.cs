@@ -1034,6 +1034,69 @@ namespace E_CommerceSystem
             }
         }
 
+        static void GenerateProductSummaryReport()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            DisplayHeader("Product Summary Report");
+            Console.ResetColor();
+
+            var report = context.Products
+                                .Select(p => new
+                                {
+                                    p.productName,
+                                    p.Category.categoryName,
+                                    ReviewCount = p.Reviews.Count(),
+                                    AvgRating = p.Reviews.Any() ? p.Reviews.Average(r => r.rating) : 0.0,
+                                    p.stockQuantity
+                                })
+                                .ToList();
+
+            if (!report.Any())
+            {
+                Console.WriteLine("\nNo products found.");
+                return;
+            }
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(string.Format("\n{0,-25} | {1,-15} | {2,-8} | {3,-10} | {4,-8}",
+                "Product Name", "Category", "Reviews", "Avg Rating", "Stock"));
+            Console.WriteLine(new string('-', 75));
+            Console.ResetColor();
+
+            foreach (var item in report)
+            {
+                string name = item.productName.Length > 25
+                    ? item.productName.Substring(0, 22) + "..."
+                    : item.productName;
+
+                string category = item.categoryName.Length > 15
+                    ? item.categoryName.Substring(0, 12) + "..."
+                    : item.categoryName;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(string.Format("{0,-25} | {1,-15} | {2,-8} | {3,-10:F1} | {4,-8}",
+                    name, category, item.ReviewCount, item.AvgRating, item.stockQuantity));
+            }
+
+            Console.ResetColor();
+            Console.WriteLine(new string('=', 75));
+
+            // Part B - Lazy Loading Demo
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("\n--- Lazy Loading Demo ---");
+            Console.ResetColor();
+
+            Product product = context.Products.FirstOrDefault();
+            if (product != null)
+            {
+                // Second query fires HERE when Reviews is accessed
+                var reviews = product.Reviews;
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"\nProduct '{product.productName}' has {reviews.Count} review(s).");
+                Console.WriteLine("(Second query fired on Reviews access — lazy loading confirmed)");
+                Console.ResetColor();
+            }
+        }
 
         static void Main(string[] args)
         {
@@ -1111,7 +1174,7 @@ namespace E_CommerceSystem
                         ViewOrderHistory();
                         break;
                     case "12":
-                        //GenerateProductSummaryReport();
+                        GenerateProductSummaryReport();
                         break;
                     case "0":
                         exit = true;
