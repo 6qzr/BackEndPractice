@@ -989,6 +989,52 @@ namespace E_CommerceSystem
             Console.WriteLine("======================================================================================");
         }
 
+        static void ViewOrderHistory()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            DisplayHeader("View Order History");
+            Console.ResetColor();
+
+            int userId = GetUserID();
+            if (userId == -1) return;
+
+            User user = context.Users.Include(u => u.Orders).ThenInclude(o => o.OrderItems).ThenInclude(i => i.Product).FirstOrDefault(u => u.userId == userId);
+
+            foreach (Order order in user.Orders)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\n======================================================================================");
+                Console.WriteLine(string.Format("  Order ID: {0}  |  Date: {1}  |  Status: {2}  |  Total: {3:C}",
+                    order.orderId,
+                    order.orderDate.ToString("dd/MM/yyyy"),
+                    order.status,
+                    order.totalAmount));
+                Console.WriteLine("======================================================================================");
+                Console.ResetColor();
+
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(string.Format("{0,-25} | {1,-12} | {2,-8}", "Product Name", "Unit Price", "Qty"));
+                Console.WriteLine("--------------------------------------------------");
+                Console.ResetColor();
+
+                foreach (OrderItem item in order.OrderItems)
+                {
+                    string truncatedProdName = item.Product.productName.Length > 25
+                        ? item.Product.productName.Substring(0, 22) + "..."
+                        : item.Product.productName;
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(string.Format("{0,-25} | {1,-12:C} | {2,-8}",
+                        truncatedProdName,
+                        item.unitPrice,
+                        item.quantity));
+                }
+                Console.ResetColor();
+                Console.WriteLine("======================================================================================");
+            }
+        }
+
+
         static void Main(string[] args)
         {
             bool exit = false;
@@ -1062,7 +1108,7 @@ namespace E_CommerceSystem
                         GetCategoryWithProducts();
                         break;
                     case "11":
-                        //ViewOrderHistory();
+                        ViewOrderHistory();
                         break;
                     case "12":
                         //GenerateProductSummaryReport();
