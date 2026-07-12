@@ -12,11 +12,11 @@ namespace E_CommerceSystem.Models
     {
         [ForeignKey(nameof(Order))]
         public int orderId { get; set; }
-        public Order Order { get; set; }
+        public virtual Order Order { get; set; }
 
         [ForeignKey(nameof(Product))]
         public int productId { get; set; }
-        public Product Product { get; set; }
+        public virtual Product Product { get; set; }
 
         [Required]
         [Range(1, 999)]
