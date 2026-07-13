@@ -1,0 +1,25 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
+
+namespace E_CommerceSystem.Models
+{
+    [PrimaryKey(nameof(orderId), nameof(productId))]
+    public class OrderItem
+    {
+        [ForeignKey(nameof(Order))]
+        public int orderId { get; set; }
+        public Order Order { get; set; }
+
+        [ForeignKey(nameof(Product))]
+        public int productId { get; set; }
+        public Product Product { get; set; }
+
+        [Required]
+        [Range(1, 999)]
+        public int quantity { get; set; }
+    }
+}
