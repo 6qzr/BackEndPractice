@@ -1,7 +1,7 @@
-﻿using E_CommerceSystem.Models;
+﻿using FirstWebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace E_CommerceSystem
+namespace FirstWebAPI
 {
     public class ECommerceContext   :   DbContext
     {
