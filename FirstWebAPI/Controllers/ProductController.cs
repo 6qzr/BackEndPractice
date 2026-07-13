@@ -11,9 +11,9 @@ namespace FirstWebApp.Controllers
 
         private ProductService productService;
 
-        public ProductController(ProductService _productService)
+        public ProductController(ProductService productService)
         {
-            productService = _productService;
+            this.productService = productService;
         }
 
         [HttpGet("GetAllProducts")]
