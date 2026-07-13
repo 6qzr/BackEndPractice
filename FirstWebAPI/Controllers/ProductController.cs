@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FirstWebApp.Controllers
 {
     [ApiController]
-    [Route("product")]
+    [Route("product")] // the URL path becomes => /product/...
     public class ProductController : ControllerBase
     {
 
@@ -16,7 +16,7 @@ namespace FirstWebApp.Controllers
             this.productService = productService;
         }
 
-        [HttpGet("GetAllProducts")]
+        [HttpGet("GetAllProducts")] // => /product/GetAllProducts
         public IActionResult GetAllProducts()
         {
             return Ok(productService.GetAllProducts());
