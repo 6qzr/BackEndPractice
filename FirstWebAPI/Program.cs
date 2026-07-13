@@ -1,3 +1,5 @@
+using FirstWebAPI.Repositories;
+using FirstWebAPI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace FirstWebAPI
@@ -13,13 +15,13 @@ namespace FirstWebAPI
             builder.Services.AddDbContext<ECommerceContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            //builder.Services.AddScoped<ProductRepo>();
+            builder.Services.AddScoped<ProductRepo>();
             //builder.Services.AddScoped<CategoryRepo>();
             //builder.Services.AddScoped<UserRepo>();
             //builder.Services.AddScoped<OrderRepo>();
             //builder.Services.AddScoped<ReviewRepo>();
 
-            //builder.Services.AddScoped<ProductService>();
+            builder.Services.AddScoped<ProductService>();
             //builder.Services.AddScoped<CategoryService>();
             //builder.Services.AddScoped<UserService>();
             //builder.Services.AddScoped<OrderService>();
