@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace FirstWebAPI
 {
     public class Program
@@ -7,6 +9,21 @@ namespace FirstWebAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            builder.Services.AddDbContext<ECommerceContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            //builder.Services.AddScoped<ProductRepo>();
+            //builder.Services.AddScoped<CategoryRepo>();
+            //builder.Services.AddScoped<UserRepo>();
+            //builder.Services.AddScoped<OrderRepo>();
+            //builder.Services.AddScoped<ReviewRepo>();
+
+            //builder.Services.AddScoped<ProductService>();
+            //builder.Services.AddScoped<CategoryService>();
+            //builder.Services.AddScoped<UserService>();
+            //builder.Services.AddScoped<OrderService>();
+            //builder.Services.AddScoped<ReveiwService>();
 
             builder.Services.AddControllers();
 
@@ -31,9 +48,10 @@ namespace FirstWebAPI
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
+            
+            // Run application
             app.Run();
         }
     }
