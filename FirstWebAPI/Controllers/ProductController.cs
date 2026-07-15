@@ -36,7 +36,7 @@ namespace FirstWebApp.Controllers
         }
 
         [HttpPut("UpdatePrice")]
-        public IActionResult UpdatePrice(int productId, int newPrice)
+        public IActionResult UpdatePrice(int productId, decimal newPrice)
         {
             bool updated = productService.UpdatePrice(productId, newPrice);
 

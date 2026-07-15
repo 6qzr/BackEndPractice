@@ -29,7 +29,7 @@ namespace FirstWebAPI.Services
             return product.productId;
         }
 
-        public bool UpdatePrice(int productId, int newPrice)
+        public bool UpdatePrice(int productId, decimal newPrice)
         {
             Product product = repo.GetProductById(productId);
             if (product == null)
