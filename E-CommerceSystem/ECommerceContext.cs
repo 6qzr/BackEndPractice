@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace E_CommerceSystem
@@ -14,5 +15,11 @@ namespace E_CommerceSystem
         public DbSet<Order>     Orders      { get; set; }
         public DbSet<OrderItem> OrderItems  { get; set; }
         public DbSet<Review>    Reviews     { get; set; }
+
+
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
+            options.UseSqlServer("Server=localhost; Database=ECommerceDB; Trusted_Connection=True; TrustServerCertificate=True;").UseLazyLoadingProxies();
+        }
     }
 }
