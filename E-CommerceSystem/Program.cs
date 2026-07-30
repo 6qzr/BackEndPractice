@@ -1,10 +1,6 @@
 ﻿using E_CommerceSystem.Models;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design.Internal;
-using System.ComponentModel.DataAnnotations;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace E_CommerceSystem
 {
